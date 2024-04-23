@@ -1,12 +1,26 @@
 # Funkcja pomocnicza do konwersji liczby na listę bitów
 def int_to_bits(n, width):
+    # Jeśli liczba bitów nie jest podzielna przez 3, powielić bity znaku
+    if width % 3 != 0:
+        # Obliczanie liczby dodatkowych bitów znaku
+        additional_sign_bits = 3 - (width % 3)
+
+        # Rozszerzenie liczby bitów o dodatkowe bity znaku
+        width += additional_sign_bits
+
+    # Dla liczby ujemnej dodaj odpowiednią wartość do konwersji na dopełnienie do dwóch
+    if n < 0:
+        n = (1 << width) + n
+
     bits = [int(b) for b in f'{n:0{width}b}']
+
     return bits[::-1]  # Odwrócenie bitów, aby indeksacja była od najmłodszego do najstarszego
+
 
 # Algorytm mnożenia Bootha radix-8 (Full-width) z poprawioną indeksacją
 def booth_radix8_full(x, y):
     # Uzyskanie bitów mnożnika z poprawną indeksacją
-    y_bits = int_to_bits(y, 9)  # Przyjmujemy 8-bitowy mnożnik
+    y_bits = int_to_bits(y, 10)  # Przyjmujemy 8-bitowy mnożnik
     w = (len(y_bits) + 2) // 3  # Liczba częściowych produktów
 
     # Lista do przechowywania częściowych produktów
@@ -14,8 +28,6 @@ def booth_radix8_full(x, y):
 
     # Generowanie częściowych produktów z kontrolą indeksowania
     for i in range(w):
-        # Bezpieczne indeksowanie, aby uniknąć "index out of range"
-        if 3 * i + 2 < len(y_bits):
             # Ustawienie bitu overlap, jeśli jest poza zakresem, używając wartości domyślnej
             overlap_bit = y_bits[3 * i - 1] if (3 * i - 1) >= 0 else 0
 
@@ -49,8 +61,9 @@ def booth_radix8_full(x, y):
 
 
 # Test algorytmu z przykładowymi wartościami
-x = 5000  # Mnożna
-y = 128  # Mnożnik
+x = 100  # Mnożna
+y = 100 # Mnożnik
+# bledy dla wartosci 20, -20, 100, -100
 
 # Wynik dla wersji full-width
 result_full = booth_radix8_full(x, y)
