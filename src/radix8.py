@@ -1,5 +1,6 @@
 # Funkcja pomocnicza do konwersji liczby na listę bitów
 def int_to_bits(n, width):
+
     # Jeśli liczba bitów nie jest podzielna przez 3, powielić bity znaku
     if width % 3 != 0:
         # Obliczanie liczby dodatkowych bitów znaku
@@ -17,10 +18,10 @@ def int_to_bits(n, width):
     return bits[::-1]  # Odwrócenie bitów, aby indeksacja była od najmłodszego do najstarszego
 
 
-# Algorytm mnożenia Bootha radix-8 (Full-width) z poprawioną indeksacją
+# Algorytm mnożenia Bootha radix-8 (Full-width)
 def booth_radix8_full(x, y):
-    # Uzyskanie bitów mnożnika z poprawną indeksacją
-    y_bits = int_to_bits(y, 10)  # Przyjmujemy 8-bitowy mnożnik
+    # Uzyskanie bitowej reprezentacji mnożnika
+    y_bits = int_to_bits(y, 10)
     w = (len(y_bits) + 2) // 3  # Liczba częściowych produktów
 
     # Lista do przechowywania częściowych produktów
@@ -61,10 +62,9 @@ def booth_radix8_full(x, y):
 
 
 # Test algorytmu z przykładowymi wartościami
-x = 100  # Mnożna
-y = 100 # Mnożnik
-# bledy dla wartosci 20, -20, 100, -100
+x = 5  # Mnożna
+y = -7 # Mnożnik
 
-# Wynik dla wersji full-width
+# Wynik mnozenia radix-8 full-width
 result_full = booth_radix8_full(x, y)
-print("Wynik radix-8 (full-width):", result_full)
+print("Wynik:", result_full)
