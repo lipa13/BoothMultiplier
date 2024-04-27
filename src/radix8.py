@@ -71,7 +71,7 @@ def booth_radix8_full(x, y):
 
 def booth_radix8_post_truncated(x, y, n):
     # Musimy wyliczyc ile bitow bedzie mial wynik (2n+1) i ograniczyc  czesciowe do n bitow (starszych, mlodsze ucinamy)
-    #mask = ((1 << (n+1)) - 1) << n
+    # mask = ((1 << (n+1)) - 1) << n
     mask = ((1 << (2 * n)) - 1) ^ ((1 << n) - 1)
 
     result = booth_radix8_full(x, y) & mask
@@ -80,14 +80,14 @@ def booth_radix8_post_truncated(x, y, n):
 
 
 # Test algorytmu z przykładowymi wartościami
-x = 7 # Mnożna
-y = 7 # Mnożnik
+x = 7  # Mnożna
+y = 7  # Mnożnik
 
 # Wynik mnozenia radix-8 full-width
 result_full = booth_radix8_full(x, y)
 print("Wynik mnożenia radix-8 full-width:", result_full)
 
-n = 4 # liczba bitow mnoznika i mnoznej (wynik mnozenia: 2n + 1)
+n = 4  # liczba bitow mnoznika i mnoznej (wynik mnozenia: 2n + 1)
 
 result_post_truncated = booth_radix8_post_truncated(x, y, n)
 print("Post-truncated radix-8 result:", result_post_truncated)
