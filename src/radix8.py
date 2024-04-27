@@ -69,52 +69,25 @@ def booth_radix8_full(x, y):
     return result
 
 
-# Truncated Booth Radix-8 Multiplier with Safe Handling of Negative Numbers
-def booth_radix8_truncated(x, y, width):
-    # Maximum value to keep the results within the specified width
-    max_value = (1 << width) - 1
+def booth_radix8_post_truncated(x, y, n):
+    # Musimy wyliczyc ile bitow bedzie mial wynik (2n+1) i ograniczyc  czesciowe do n bitow (starszych, mlodsze ucinamy)
+    #mask = ((1 << (n+1)) - 1) << n
+    mask = ((1 << (2 * n)) - 1) ^ ((1 << n) - 1)
 
-    # Convert the multiplier to the correct bit representation
-    y_bits = int_to_bits(y, width)
-
-    # Determine the number of partial products
-    w = (len(y_bits) + 2) // 3
-
-    # List to store partial products
-    partial_products = []
-
-    # Generate partial products with bitwise controls to maintain fixed-width
-    for i in range(w):
-        # Safe handling of the overlap bit
-        overlap_bit = y_bits[3 * i - 1] if (3 * i - 1) >= 0 else 0
-
-        # Calculate di with appropriate indexing and bit handling
-        di = -4 * y_bits[3 * i + 2] + 2 * y_bits[3 * i + 1] + y_bits[3 * i] + overlap_bit
-
-        # Generate the partial product with controlled shifting
-        partial_product = x * di
-
-        # Shift and apply mask to ensure fixed-width without affecting the sign bit
-        partial_product_shifted = (partial_product & max_value) << (3*i)
-
-        partial_products.append(partial_product_shifted)
-
-    # Sum the partial products and apply the mask
-    result = sum(partial_products)
+    result = booth_radix8_full(x, y) & mask
 
     return result
 
 
 # Test algorytmu z przykładowymi wartościami
-x = 20  # Mnożna
-y = 20  # Mnożnik
+x = 7 # Mnożna
+y = 7 # Mnożnik
 
 # Wynik mnozenia radix-8 full-width
 result_full = booth_radix8_full(x, y)
 print("Wynik mnożenia radix-8 full-width:", result_full)
 
-# Truncated result for specified width
-width = 8  # Desired fixed-width
-result_truncated = booth_radix8_truncated(x, y, width)
+n = 4 # liczba bitow mnoznika i mnoznej (wynik mnozenia: 2n + 1)
 
-print("Truncated radix-8 result:", result_truncated)
+result_post_truncated = booth_radix8_post_truncated(x, y, n)
+print("Post-truncated radix-8 result:", result_post_truncated)
