@@ -87,4 +87,4 @@ print("Wynik mnożenia radix-8 full-width:", result_full)
 n = 4  # liczba bitow mnoznika i mnoznej (wynik mnozenia: 2n + 1)
 
 result_post_truncated = booth_radix8_post_truncated(x, y, n)
-print("Wynik mnożenia radix-8 full-width post-truncated:", result_post_truncated)
+print("Wynik mnożenia radix-8 fixed-width post-truncated:", result_post_truncated)
