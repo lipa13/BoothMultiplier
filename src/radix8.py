@@ -34,30 +34,28 @@ def booth_radix8_full(x, y):
         # Obliczenie wartości di
         di = -4 * y_bits[3 * i + 2] + 2 * y_bits[3 * i + 1] + y_bits[3 * i] + overlap_bit
 
-        """
-        Wybór odpowiedniej operacji w zależności od wartości di
+         # Wybór odpowiedniej operacji w zależności od wartości di
         if di == 0:
-            partial_products.append(0)
+            partial_product = 0
         elif di == 1:
-            partial_products.append(x << (3 * i))
+            partial_product = x
         elif di == 2:
-            partial_products.append((x << 1) << (3 * i))
+            partial_product = x << 1
         elif di == 3:
-            partial_products.append((x + (x << 1)) << (3 * i))
+            partial_product = x + (x << 1)
         elif di == 4:
-            partial_products.append((x << 2) << (3 * i))
+            partial_product = x << 2
         elif di == -1:
-            partial_products.append((~x + 1) << (3 * i))
+            partial_product = -x
         elif di == -2:
-            partial_products.append(~((x << 1)) + 1 << (3 * i))
+            partial_product = -(x << 1)
         elif di == -3:
-            partial_products.append(~((x + (x << 1))) + (1 << (3 * i)))
+            partial_product = -(x + (x << 1))
         elif di == -4:
-            partial_products.append(~((x << 2) + 1 << (3 * i)))
-        """
+            partial_product = -(x << 2)
 
-        partial_product = x*di  # Generowanie częściowego produktu
-        partial_product_shifted = partial_product << (3 * i)  # Przesunięcie i dodanie do listy częściowych produktów
+        # Przesunięcie częściowego produktu i dodanie do listy
+        partial_product_shifted = partial_product << (3 * i)
         partial_products.append(partial_product_shifted)
 
     # Sumowanie wszystkich częściowych produktów
@@ -66,6 +64,7 @@ def booth_radix8_full(x, y):
     return result
 
 
+"""
 def booth_radix8_post_truncated(x, y, n):
     # Musimy wyliczyc ile bitow bedzie mial wynik (2n+1) i ograniczyc  czesciowe do n bitow (starszych, mlodsze ucinamy)
     # mask = ((1 << (n+1)) - 1) << n
@@ -74,7 +73,7 @@ def booth_radix8_post_truncated(x, y, n):
     result = booth_radix8_full(x, y) & mask
 
     return result
-
+"""
 
 # Test algorytmu z przykładowymi wartościami
 x = 7  # Mnożna
@@ -84,7 +83,9 @@ y = 12  # Mnożnik
 result_full = booth_radix8_full(x, y)
 print("Wynik mnożenia radix-8 full-width:", result_full)
 
+"""
 n = 4  # liczba bitow mnoznika i mnoznej (wynik mnozenia: 2n + 1)
 
 result_post_truncated = booth_radix8_post_truncated(x, y, n)
 print("Wynik mnożenia radix-8 fixed-width post-truncated:", result_post_truncated)
+"""
