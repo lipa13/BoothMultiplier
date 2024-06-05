@@ -1,3 +1,5 @@
+import time
+
 # Funkcja pomocnicza do konwersji liczby na listę bitów
 def int_to_bits(n, width):
     # Jeśli liczba bitów nie jest podzielna przez 2, powielić bity znaku
@@ -34,21 +36,18 @@ def booth_radix4_full(x, y):
         # Obliczenie wartości di
         di = -2 * y_bits[2 * i + 1] + y_bits[2 * i] + overlap_bit
 
-        """
-        Wybór odpowiedniej operacji w zależności od wartości di
+
         if di == 0:
             partial_product = 0
         elif di == 1:
-            partial_product = x << (2 * i)
+            partial_product = x
         elif di == 2:
-            partial_product = (x << 1) << (2 * i)
+            partial_product = (x << 1)
         elif di == -1:
-            partial_product = (~x + 1) << (2 * i)
+            partial_product = (~x + 1)
         elif di == -2:
-            partial_product = ~(x << 1) + 1 << (2 * i)
-        """
+            partial_product = ~(x << 1) + 1
 
-        partial_product = x * di  # Generowanie częściowego produktu
         partial_product_shifted = partial_product << (2 * i)  # Przesunięcie i dodanie do listy częściowych produktów
         partial_products.append(partial_product_shifted)
 
@@ -58,7 +57,7 @@ def booth_radix4_full(x, y):
     return result
 
 
-def booth_radix4_post_truncated(x, y, n):
+def booth_radix4_fixed(x, y, n):
     mask = ((1 << (2 * n)) - 1) ^ ((1 << n) - 1)
 
     result = booth_radix4_full(x, y) & mask
@@ -70,11 +69,23 @@ def booth_radix4_post_truncated(x, y, n):
 x = 7  # Mnożna
 y = 12  # Mnożnik
 
+
 # Wynik mnożenia radix-4 full-width
+
+start_time = time.perf_counter()
 result_full = booth_radix4_full(x, y)
+end_time = time.perf_counter()
+time_in_micro = (end_time - start_time) * (10 ** 6)
 print("Wynik mnożenia radix-4 full-width:", result_full)
+print("Czas dzialania algorytmu: ", round(time_in_micro, 2))
+
+
+# Wynik mnożenie radix-4 post-truncated
 
 n = 4  # liczba bitow mnoznika i mnoznej (wynik mnozenia: 2n + 1)
-
-result_post_truncated = booth_radix4_post_truncated(x, y, n)
+start_time = time.perf_counter()
+result_post_truncated = booth_radix4_fixed(x, y, n)
+end_time = time.perf_counter()
+time_in_micro = (end_time - start_time) * (10 ** 6)
 print("Wynik mnożenia radix-4 fixed-width post-truncated:", result_post_truncated)
+print("Czas dzialania algorytmu: ", round(time_in_micro, 2))
