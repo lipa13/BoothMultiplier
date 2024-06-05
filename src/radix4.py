@@ -1,91 +1,68 @@
-import time
-
-# Funkcja pomocnicza do konwersji liczby na listę bitów
 def int_to_bits(n, width):
-    # Jeśli liczba bitów nie jest podzielna przez 2, powielić bity znaku
     if width % 2 != 0:
-        # Obliczanie liczby dodatkowych bitów znaku
-        additional_sign_bits = 2 - (width % 2)
+        width += 1
 
-        # Rozszerzenie liczby bitów o dodatkowe bity znaku
-        width += additional_sign_bits
-
-    # Dla liczby ujemnej dodaj odpowiednią wartość do konwersji na dopełnienie do dwóch
     if n < 0:
         n = (1 << width) + n
 
     bits = [int(b) for b in f'{n:0{width}b}']
+    return bits[::-1]
 
-    return bits[::-1]  # Odwrócenie bitów, aby indeksacja była od najmłodszego do najstarszego
+def bits_to_int(bits):
+    result = 0
+    for i, bit in enumerate(bits):
+        result += bit << i
+    return result
 
-
-# Algorytm mnożenia Bootha radix-4 (Full-width)
 def booth_radix4_full(x, y):
-    # Uzyskanie bitowej reprezentacji mnożnika
-    y_bits = int_to_bits(y, 10)
-    w = (len(y_bits) + 1) // 2  # Liczba częściowych produktów
+    bit_length = max(x.bit_length(), y.bit_length()) + 1
+    bit_length = (bit_length + 1) // 2 * 2
+    x_bits = int_to_bits(x, bit_length)
+    y_bits = int_to_bits(y, bit_length)
+    w = (len(y_bits) + 1) // 2
 
-    # Lista do przechowywania częściowych produktów
     partial_products = []
 
-    # Generowanie częściowych produktów z kontrolą indeksowania
     for i in range(w):
-        # Ustawienie bitu overlap, jeśli jest poza zakresem, używając wartości domyślnej
         overlap_bit = y_bits[2 * i - 1] if (2 * i - 1) >= 0 else 0
-
-        # Obliczenie wartości di
         di = -2 * y_bits[2 * i + 1] + y_bits[2 * i] + overlap_bit
-
 
         if di == 0:
             partial_product = 0
         elif di == 1:
             partial_product = x
         elif di == 2:
-            partial_product = (x << 1)
+            partial_product = x << 1
         elif di == -1:
-            partial_product = (~x + 1)
+            partial_product = -x
         elif di == -2:
-            partial_product = ~(x << 1) + 1
+            partial_product = -(x << 1)
 
-        partial_product_shifted = partial_product << (2 * i)  # Przesunięcie i dodanie do listy częściowych produktów
-        partial_products.append(partial_product_shifted)
+        partial_product_shifted = partial_product << (2 * i)
+        partial_product_bits = int_to_bits(partial_product_shifted, 2 * bit_length)
+        partial_products.append(partial_product_bits)
 
-    # Sumowanie wszystkich częściowych produktów
-    result = sum(partial_products)
+    result_bits = [0] * (2 * bit_length)
+    carry = 0
+
+    for bit_position in range(2 * bit_length):
+        column_sum = carry
+        for pp in partial_products:
+            if bit_position < len(pp):
+                column_sum += pp[bit_position]
+
+        result_bits[bit_position] = column_sum % 2
+        carry = column_sum // 2
+
+    result = bits_to_int(result_bits)
+
+    # Correct the sign if the result is negative
+    if result_bits[-1] == 1:
+        result -= (1 << (2 * bit_length))
 
     return result
 
-
-def booth_radix4_fixed(x, y, n):
-    mask = ((1 << (2 * n)) - 1) ^ ((1 << n) - 1)
-
-    result = booth_radix4_full(x, y) & mask
-
-    return result
-
-
-# Test algorytmu z przykładowymi wartościami
-x = 7  # Mnożna
-y = 12  # Mnożnik
-
-
-# Wynik mnożenia radix-4 full-width
-
-start_time = time.perf_counter()
-result_full = booth_radix4_full(x, y)
-end_time = time.perf_counter()
-time_in_micro = (end_time - start_time) * (10 ** 6)
-print("Wynik mnożenia radix-4 full-width:", result_full)
-print("Czas dzialania algorytmu: ", round(time_in_micro, 2))
-
-
-# Wynik mnożenie radix-4 post-truncated
-
-n = 4  # liczba bitow mnoznika i mnoznej (wynik mnozenia: 2n + 1)
-start_time = time.perf_counter()
-result_post_truncated = booth_radix4_fixed(x, y, n)
-end_time = time.perf_counter()
-time_in_micro = (end_time - start_time) * (10 ** 6)
-print("Wynik mnożenia radix-4 fixed-width post-truncated:", result_post_truncated)
-print("Czas dzialania algorytmu: ", round(time_in_micro, 2))
+# Testowanie
+x = -7
+y = 12
+print(f"Wynik mnożenia {x} * {y} = {booth_radix4_full(x, y)}")
