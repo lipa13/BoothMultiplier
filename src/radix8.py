@@ -1,6 +1,5 @@
 import time
 
-
 def half_adder(bit1, bit2):
     sum_bit = bit1 ^ bit2
     carry_out = bit1 & bit2
@@ -32,7 +31,6 @@ def bits_to_int(bits):
 def booth_radix8_full(x, y):
     bit_length = max(x.bit_length(), y.bit_length()) + 1
     bit_length = (bit_length + 2) // 3 * 3
-    x_bits = int_to_bits(x, bit_length)
     y_bits = int_to_bits(y, bit_length)
     w = (len(y_bits) + 2) // 3
 
@@ -91,7 +89,6 @@ def booth_radix8_full(x, y):
 def booth_radix8_fixed(x, y):
     bit_length = max(x.bit_length(), y.bit_length()) + 1
     bit_length = (bit_length + 2) // 3 * 3
-    x_bits = int_to_bits(x, bit_length)
     y_bits = int_to_bits(y, bit_length)
     w = (len(y_bits) + 2) // 3
 
@@ -124,46 +121,42 @@ def booth_radix8_fixed(x, y):
         partial_product_bits = int_to_bits(partial_product_shifted, 2 * bit_length)
         partial_products.append(partial_product_bits)
 
+
     # Wynik o dlugosci 2n (mlodsze n - same 0)
     result_bits = [0] * 2 * bit_length
-    carry = [0] * (bit_length + 1)
+    carry = 0
 
-
-
-    # Wyliczamy przeniesienie z mldoszych n bitow
+    # Wyliczamy przeniesienie z mlodszych n bitow
     for bit_position in range(bit_length):
-        column_sum = carry[bit_position]
+        column_sum = carry
         # dla kazdego iloczynu czesciowego:
         for pp in partial_products:
             column_sum += pp[bit_position]
 
-        # nastepne przenisienie to column_sum mod 2
-        carry[bit_position + 1] = column_sum // 2
-
+        carry = column_sum // 2
 
     # Sumowanie starszych n bitow (z propagowanym przeniesieniem)
-    carry_in = carry[6]
     for bit_position in range(bit_length, 2 * bit_length):
-        column_sum = carry_in    # dla n+1 bitu
+        column_sum = carry  # dla n+1 bitu
         for pp in partial_products:
             if bit_position < len(pp):
                 column_sum += pp[bit_position]
 
         result_bits[bit_position] = column_sum % 2
-        carry_in = column_sum // 2
+        carry = column_sum // 2
 
     result = bits_to_int(result_bits)
 
     # Correct the sign if the result is negative
     if result_bits[-1] == 1:
-        result -= (1 << bit_length)
+        result -= (1 << (2 * bit_length))
 
     return result
 
 
 # Test algorytmu z przykładowymi wartościami
 x = 7  # Mnożna
-y = 12 # Mnożnik
+y = 12  # Mnożnik
 
 
 #result = booth_radix8_full(x, y)
@@ -181,7 +174,6 @@ for i in range(100):
     result_full = booth_radix8_full(x, y)
     end_time = time.perf_counter()
     time_in_micro += (end_time - start_time) * (10 ** 6)
-    #print("Wynik mnożenia radix-8 full-width:", result_full)
 
 print("Sredni czas mnozenia radix-8 full-width dla 100 pomiarow: ", time_in_micro / 100.0)
 print("Wynik:", result_full)
