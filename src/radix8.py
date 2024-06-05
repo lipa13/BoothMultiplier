@@ -158,14 +158,6 @@ def booth_radix8_fixed(x, y):
 x = 7  # Mnożna
 y = 12  # Mnożnik
 
-
-#result = booth_radix8_full(x, y)
-#print("Wynik mnozenie Bootha radix-8 full-width: ", x, " * ", y, " = ", result, "\n")
-
-#result = booth_radix8_fixed(x, y)
-#print("Wynik mnozenie Bootha radix-8 fixed-width (post-truncated): ", x, " * ", y, " = ", result, "\n")
-
-
 time_in_micro = 0
 
 # Petla do pomiarow dla radix-8 full-width
@@ -177,9 +169,6 @@ for i in range(100):
 
 print("Sredni czas mnozenia radix-8 full-width dla 100 pomiarow: ", time_in_micro / 100.0)
 print("Wynik:", result_full)
-
-
-n = 4  # liczba bitow mnoznika i mnoznej (wynik mnozenia: 2n + 1)
 
 # Petla do pomiarow dla radix-8 full-width
 for i in range(100):
